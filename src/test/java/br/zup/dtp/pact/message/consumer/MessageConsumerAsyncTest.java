@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(PactConsumerTestExt.class)
 @PactTestFor(providerName = "MessageProvider", providerType = ProviderType.ASYNCH)
-public class AsyncMessaConsumerTest {
+public class MessageConsumerAsyncTest {
 
    @Pact(consumer = "consumerV3")
    public MessagePact createPactMap(MessagePactBuilder builder) {
