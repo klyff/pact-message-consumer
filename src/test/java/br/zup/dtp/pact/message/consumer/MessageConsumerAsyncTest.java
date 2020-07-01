@@ -62,8 +62,7 @@ public class MessageConsumerAsyncTest {
    @Test
    @PactTestFor(pactMethod = "createPactMap")
    public void test(List<Message> messages) {
-      final String body = """
-          {"name":"KLYFF HARLLEY TOLEDO","id":"1001","types":\"user\"}""".trim();
+      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
 
       assertThat(new String(messages.get(0).contentsAsBytes()), is(body));
       assertThat(messages.get(0).getMetaData(), hasEntry("destination", "X010"));
@@ -72,9 +71,7 @@ public class MessageConsumerAsyncTest {
    @Test
    @PactTestFor(pactMethod = "createPactJsonMessage")
    public void test2(MessagePact pact) {
-
-      final String body = """
-          {"name":"KLYFF HARLLEY TOLEDO","id":"1001","type":\"user\"}""".trim();
+      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
 
       assertThat(new String(pact.getMessages().get(0).contentsAsBytes()), is(body));
    }
