@@ -23,15 +23,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @PactTestFor(providerName = "MessageProvider", providerType = ProviderType.ASYNCH)
 public class MessageConsumerAsyncTest {
 
-   @Pact(consumer = "consumerV3")
+   @Pact(consumer = "MessageConsumer-Spec3")
    public MessagePact createPactMap(MessagePactBuilder builder) {
       PactDslJsonBody body = new PactDslJsonBody();
       body.stringValue("name", "KLYFF HARLLEY TOLEDO");
       body.stringValue("id", "1001");
+      body.stringValue("type", "user");
 
 
       Map<String, Object> metadata = new HashMap<>();
-      metadata.put("destination", Matchers.regexp("\\w+\\d+", "X001"));
+      metadata.put("destination", Matchers.regexp("\\w+\\d+", "X010"));
 
       return builder.given("ProviderState")
           .expectsToReceive("First Test Map Message")
@@ -40,11 +41,12 @@ public class MessageConsumerAsyncTest {
           .toPact();
    }
 
-   @Pact(provider = "MessageProvider", consumer = "consumerV3")
+   @Pact(provider = "MessageProvider", consumer = "MessageConsumer-Spec3")
    public MessagePact createPactJsonMessage(MessagePactBuilder builder) {
       PactDslJsonBody body = new PactDslJsonBody();
       body.stringValue("name", "KLYFF HARLLEY TOLEDO");
       body.stringValue("id", "1001");
+      body.stringValue("type", "user");
 
 
       Map<String, String> metadata = new HashMap<String, String>();
@@ -60,13 +62,20 @@ public class MessageConsumerAsyncTest {
    @Test
    @PactTestFor(pactMethod = "createPactMap")
    public void test(List<Message> messages) {
-      assertThat(new String(messages.get(0).contentsAsBytes()), is("{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\"}"));
-      assertThat(messages.get(0).getMetaData(), hasEntry("destination", "X001"));
+      final String body = """
+          {"name":"KLYFF HARLLEY TOLEDO","id":"1001","types":\"user\"}""".trim();
+
+      assertThat(new String(messages.get(0).contentsAsBytes()), is(body));
+      assertThat(messages.get(0).getMetaData(), hasEntry("destination", "X010"));
    }
 
    @Test
    @PactTestFor(pactMethod = "createPactJsonMessage")
    public void test2(MessagePact pact) {
-      assertThat(new String(pact.getMessages().get(0).contentsAsBytes()), is("{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\"}"));
+
+      final String body = """
+          {"name":"KLYFF HARLLEY TOLEDO","id":"1001","type":\"user\"}""".trim();
+
+      assertThat(new String(pact.getMessages().get(0).contentsAsBytes()), is(body));
    }
 }
