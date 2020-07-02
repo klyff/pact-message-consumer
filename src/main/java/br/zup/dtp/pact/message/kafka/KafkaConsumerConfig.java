@@ -21,7 +21,7 @@ public class KafkaConsumerConfig {
    public static final String BOOTSTRAP_SERVERS = "localhost:9092";
    public static final String GROUP_ID = "clientGroup";
 
-   @Bean
+   @Bean(name = "consumerFactory")
    @ConditionalOnMissingBean(name = "listenerContainerFactory")
    public ConsumerFactory<String, Client> consumerFactory() {
       Map<String, Object> config = new HashMap<>();
@@ -41,8 +41,26 @@ public class KafkaConsumerConfig {
       return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(Client.class));
    }
 
-   @Bean
-   @ConditionalOnMissingBean(name = "clientListener")
+   @Bean(name = "consumerFactoryObject")
+   public ConsumerFactory<Object, Object> consumerFactoryObject() {
+      Map<String, Object> config = new HashMap<>();
+      config.put(
+          ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+          BOOTSTRAP_SERVERS);
+      config.put(
+          ConsumerConfig.GROUP_ID_CONFIG,
+          GROUP_ID);
+      config.put(
+          ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+          StringDeserializer.class);
+      config.put(
+          ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+          StringDeserializer.class);
+
+      return new DefaultKafkaConsumerFactory<>(config);
+   }
+
+   @Bean(name = "listenerContainerFactory")
    public ConcurrentKafkaListenerContainerFactory<String, Client> listenerContainerFactory() {
       ConcurrentKafkaListenerContainerFactory<String, Client> factory = new ConcurrentKafkaListenerContainerFactory<>();
       factory.setConsumerFactory(consumerFactory());
