@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -21,6 +22,7 @@ public class KafkaConsumerConfig {
    public static final String GROUP_ID = "clientGroup";
 
    @Bean
+   @ConditionalOnMissingBean(name = "listenerContainerFactory")
    public ConsumerFactory<String, Client> consumerFactory() {
       Map<String, Object> config = new HashMap<>();
       config.put(
@@ -35,10 +37,12 @@ public class KafkaConsumerConfig {
       config.put(
           ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
           StringDeserializer.class);
+
       return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new JsonDeserializer<>(Client.class));
    }
 
    @Bean
+   @ConditionalOnMissingBean(name = "clientListener")
    public ConcurrentKafkaListenerContainerFactory<String, Client> listenerContainerFactory() {
       ConcurrentKafkaListenerContainerFactory<String, Client> factory = new ConcurrentKafkaListenerContainerFactory<>();
       factory.setConsumerFactory(consumerFactory());

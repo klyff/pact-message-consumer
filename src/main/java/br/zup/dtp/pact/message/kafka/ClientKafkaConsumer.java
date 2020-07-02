@@ -9,10 +9,10 @@ public class ClientKafkaConsumer {
 
    public static final String TOPIC = "client_creation";
 
-   @KafkaListener(topics = TOPIC, containerFactory = "clientListenerContainerFactory")
-   public void greetingListener(Client client) {
+   @KafkaListener(topics = TOPIC, containerFactory = "listenerConsumerFactory")
+   public void clientListener(Client client) {
 
-      log.info("Consumed message: "+client);
+      log.info("Consuming message: "+client);
 
 
    }
