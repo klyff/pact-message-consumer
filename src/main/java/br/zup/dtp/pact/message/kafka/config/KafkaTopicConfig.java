@@ -1,4 +1,4 @@
-package br.zup.dtp.pact.message.kafka;
+package br.zup.dtp.pact.message.kafka.config;
 
 import java.util.HashMap;
 import java.util.Map;
