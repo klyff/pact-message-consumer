@@ -79,7 +79,6 @@ public class MessageConsumerAsyncTest {
 //      Client clientLocal = kafkaConsumer.stringListener(body);
 //      assert(clientMessage.equals(clientLocal));
 
-
       assertThat(new String(pact.getMessages().get(0).contentsAsBytes()), is(body));
 
    }
