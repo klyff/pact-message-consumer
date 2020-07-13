@@ -24,7 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @PactTestFor(providerName = "ClientCreationMessageProvider", providerType = ProviderType.ASYNCH)
 public class MessageConsumerAsyncTest {
 
-//   @Autowired
+//   @MockBean
 //   MessageClientKafkaConsumer kafkaConsumer;
 
    @BeforeEach

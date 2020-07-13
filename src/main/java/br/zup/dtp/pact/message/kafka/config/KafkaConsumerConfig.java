@@ -3,6 +3,7 @@ package br.zup.dtp.pact.message.kafka.config;
 import br.zup.dtp.pact.message.model.Client;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,9 @@ public class KafkaConsumerConfig {
    private String groupId;
 
    Map<String, Object> config = new HashMap<>();
-   {
+
+   @PostConstruct
+   public void setUP() {
       config.put(
           ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
           bootstrapAddress);
