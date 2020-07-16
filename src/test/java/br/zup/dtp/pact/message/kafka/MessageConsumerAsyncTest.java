@@ -1,7 +1,7 @@
 package br.zup.dtp.pact.message.kafka;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
 import au.com.dius.pact.consumer.MessagePactBuilder;
@@ -16,6 +16,11 @@ import au.com.dius.pact.core.model.messaging.MessagePact;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import br.zup.dtp.pact.message.model.Client;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +29,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @PactTestFor(providerName = "ClientCreationMessageProvider", providerType = ProviderType.ASYNCH)
 public class MessageConsumerAsyncTest {
 
-//   @MockBean
-//   MessageClientKafkaConsumer kafkaConsumer;
+   static ObjectMapper mapper = new ObjectMapper();
+   static {
+      mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+      mapper.configure(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES, false);
+      mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+   }
 
    @BeforeEach
    void setUp() {
@@ -35,9 +44,9 @@ public class MessageConsumerAsyncTest {
    @Pact(provider = "ClientCreationMessageProvider", consumer = "ClientCreationMessageConsummer")
    public MessagePact createPactJsonMessage(MessagePactBuilder builder) {
       PactDslJsonBody body = new PactDslJsonBody();
-      body.stringValue("name", "KLYFF HARLLEY TOLEDO");
-      body.stringValue("id", "1001");
-      body.stringValue("type", "user");
+      body.stringType("name");
+      body.integerType("id");
+      body.stringType("type");
 
 
       Map<String, String> metadata = new HashMap<String, String>();
@@ -53,9 +62,9 @@ public class MessageConsumerAsyncTest {
    @Pact(provider = "ClientCreationMessageProvider", consumer = "ClientCreationMessageConsummer")
    public MessagePact createPactForMap(MessagePactBuilder builder) {
       PactDslJsonBody body = new PactDslJsonBody();
-      body.stringValue("name", "KLYFF HARLLEY TOLEDO");
-      body.stringValue("id", "1001");
-      body.stringValue("type", "user");
+      body.stringType("name");
+      body.integerType("id");
+      body.stringType("type");
 
 
       Map<String, Object> metadata = new HashMap<>();
@@ -73,23 +82,36 @@ public class MessageConsumerAsyncTest {
    @PactTestFor(pactMethod = "createPactJsonMessage")
    public void test2(MessagePact pact) {
 
-      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
+//      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
 
-//      Client clientMessage = kafkaConsumer.stringListener(pact.getMessages().get(0).contentsAsString());
-//      Client clientLocal = kafkaConsumer.stringListener(body);
-//      assert(clientMessage.equals(clientLocal));
+      try {
+         Client client =  mapper.readValue(pact.getMessages().get(0).getContents().valueAsString(), Client.class);
 
-      assertThat(new String(pact.getMessages().get(0).contentsAsBytes()), is(body));
+         assertThat(client.getId(), is(notNullValue()));
+         assertThat(client.getName(), is(notNullValue()));
+         assertThat(client.getType(), is(notNullValue()));
+      } catch (JsonProcessingException e) {
+         e.printStackTrace();
+      }
 
    }
 
    @Test
    @PactTestFor(pactMethod = "createPactForMap")
    public void test(List<Message> messages) {
-      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
+//      final String body = "{\"name\":\"KLYFF HARLLEY TOLEDO\",\"id\":\"1001\",\"type\":\"user\"}".trim();
 
-      assertThat(new String(messages.get(0).contentsAsBytes()), is(body));
-      assertThat(messages.get(0).getMetaData(), hasEntry("destination", "X010"));
+      try {
+         Client client =  mapper.readValue(messages.get(0).getContents().valueAsString(), Client.class);
+
+         assertThat(client.getId(), is(notNullValue()));
+         assertThat(client.getName(), is(notNullValue()));
+         assertThat(client.getType(), is(notNullValue()));
+         assertThat(messages.get(0).getMetaData(), hasEntry("destination", "X010"));
+      } catch (JsonProcessingException e) {
+         e.printStackTrace();
+      }
+
    }
 
 }
